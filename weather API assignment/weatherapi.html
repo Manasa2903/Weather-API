@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather details</title>
+
+    <style>
+        * {
+            margin: 0;
+        }
+        
+        #container {
+            background-image: url("https://wallpapercave.com/wp/WSjKlp7.jpg");
+            height: 100vh;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .weather-container {
+            padding: 20px;
+            background-color: white;
+            border-radius: 15px;
+        }
+        
+        .input {
+            width: 300px;
+            height: 30px;
+            border-radius: 10px;
+            padding: 10px;
+            border: thistle 1px solid;
+            outline: none;
+        }
+        
+        #btnGet {
+            background-color: rgb(216, 58, 30);
+            color: white;
+            border: 0;
+            border-radius: 5px;
+            width: 100px;
+            height: 30px;
+            cursor: pointer;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+        
+        .heading {
+            font-size: 30px;
+            color: rgb(216, 58, 30);
+            margin-bottom: 20px;
+        }
+        
+        .para {
+            font-size: 16px;
+            color: rgb(95, 92, 88);
+            margin-bottom: 30px;
+        }
+        
+        .sub-heading {
+            font-size: 14px;
+            font-family: sans-serif;
+            color: rgb(34, 56, 25);
+        }
+        
+        .weather {
+            color: rgb(216, 58, 30);
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div class="weather-container">
+            <h1 class="heading">Weather Report</h1>
+            <p class="para">Check weather by entering the city name in the input field below</p>
+            <label for="city"></label>
+            <input id="city" class="input" type="text" placeholder="Enter City Name" />
+
+            <div>
+                <button id="btnGet">Get Weather</button>
+            </div>
+            <h1 class="sub-heading">City Name</h1>
+            <div id="cityName" class="weather"></div><br/>
+            <h1 class="sub-heading">Description</h1>
+            <div id="description" class="weather"></div><br/>
+            <h1 class="sub-heading">Temperature</h1>
+            <div id="temperature" class="weather"></div><br/>
+            <h1 class="sub-heading">Feels Like</h1>
+            <div id="feelsLike" class="weather"></div><br/>
+            <h1 class="sub-heading">Pressure</h1>
+            <div id="pressure" class="weather"></div><br/>
+            <h1 class="sub-heading">Humidity</h1>
+            <div id="humidity" class="weather"></div><br/>
+        </div>
+
+    </div>
+
+
+
+    <script>
+        function load(url) {
+            return new Promise(function(resolve, reject) {
+                var request = new XMLHttpRequest();
+
+                request.onreadystatechange = function(e) {
+                    if (this.readyState == 4) {
+                        if (this.status == 200) {
+                            resolve(this.response);
+                        } else {
+                            reject(this.status);
+                        }
+                    }
+                }
+                request.open("GET", url, true);
+                request.send();
+
+            });
+        }
+        const btn = document.querySelector("#btnGet");
+        let city = document.getElementById("city").value;
+        let cityName = document.getElementById("cityName");
+        let description = document.getElementById("description");
+        let temperature = document.getElementById("temperature");
+        let feelsLike = document.getElementById("feelsLike");
+        let pressure = document.getElementById("pressure");
+        let humidity = document.getElementById("humidity");
+
+
+        //lets handle the onclick event listener
+        btn.onclick = function() {
+            let city = document.getElementById("city").value;
+            console.log(city)
+            load(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=ede33f2ff6006c15d1eb9e8fb725a9a7`)
+                .then(response => {
+                        const result = JSON.parse(response);
+                        console.log(result);
+                        cityName.innerHTML = result.name;
+                        description.innerHTML = result["weather"][0].description;
+                        temperature.innerHTML = (result["main"].temp - 273.5).toFixed(1) + " <sup>o</sup>C";
+                        feelsLike.innerHTML = (result["main"].feels_like - 273.5).toFixed(1) + " <sup>o</sup>C";
+                        pressure.innerHTML = result["main"].pressure + " Pa";
+                        humidity.innerHTML = result["main"].humidity + "%";
+                    },
+                    error => cityName.innerHTML = `Error: getting the message, status : ${error}`
+                );
+        }
+    </script>
+</body>
+
+</html>
